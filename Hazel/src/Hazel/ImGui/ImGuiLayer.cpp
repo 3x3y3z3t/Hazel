@@ -11,12 +11,12 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
-namespace Hazel {
+namespace Hazel
+{
 
 	ImGuiLayer::ImGuiLayer()
 		: Layer("ImGuiLayer")
-	{
-	}
+	{}
 
 	void ImGuiLayer::OnAttach()
 	{
@@ -67,11 +67,11 @@ namespace Hazel {
 		if (m_BlockEvents)
 		{
 			ImGuiIO& io = ImGui::GetIO();
-			e.Handled |= e.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
-			e.Handled |= e.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+			e.Handled |= e.IsInCategory(EventCategory::Mouse) & io.WantCaptureMouse;
+			e.Handled |= e.IsInCategory(EventCategory::Keyboard) & io.WantCaptureKeyboard;
 		}
 	}
-	
+
 	void ImGuiLayer::Begin()
 	{
 		HZ_PROFILE_FUNCTION();

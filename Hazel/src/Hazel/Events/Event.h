@@ -20,21 +20,34 @@ namespace Hazel {
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
 	};
 
-	enum EventCategory
+	enum class EventCategory
 	{
 		None = 0,
-		EventCategoryApplication    = BIT(0),
-		EventCategoryInput          = BIT(1),
-		EventCategoryKeyboard       = BIT(2),
-		EventCategoryMouse          = BIT(3),
-		EventCategoryMouseButton    = BIT(4)
+		Application = BIT(0),
+		Input = BIT(1),
+		Keyboard = BIT(2),
+		Mouse = BIT(3),
+		MouseButton = BIT(4)
 	};
+	EventCategory operator |(EventCategory lhs, EventCategory rhs);
 
-#define EVENT_CLASS_TYPE(type) static EventType GetStaticType() { return EventType::type; }\
+	EventCategory operator &(EventCategory lhs, EventCategory rhs);
+
+	EventCategory operator ^(EventCategory lhs, EventCategory rhs);
+
+	EventCategory operator ~(EventCategory rhs);
+
+	EventCategory& operator |=(EventCategory& lhs, EventCategory rhs);
+
+	EventCategory& operator &=(EventCategory& lhs, EventCategory rhs);
+
+	EventCategory& operator ^=(EventCategory& lhs, EventCategory rhs);
+
+	#define EVENT_CLASS_TYPE(type) static EventType GetStaticType() { return EventType::type; }\
 								virtual EventType GetEventType() const override { return GetStaticType(); }\
 								virtual const char* GetName() const override { return #type; }
 
-#define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
+	#define EVENT_CLASS_CATEGORY(category) virtual EventCategory GetCategoryFlags() const override { return (category); }
 
 	class Event
 	{
@@ -45,12 +58,12 @@ namespace Hazel {
 
 		virtual EventType GetEventType() const = 0;
 		virtual const char* GetName() const = 0;
-		virtual int GetCategoryFlags() const = 0;
+		virtual EventCategory GetCategoryFlags() const = 0;
 		virtual std::string ToString() const { return GetName(); }
 
 		bool IsInCategory(EventCategory category)
 		{
-			return GetCategoryFlags() & category;
+			return static_cast<bool>(GetCategoryFlags() & category);
 		}
 	};
 
@@ -59,9 +72,8 @@ namespace Hazel {
 	public:
 		EventDispatcher(Event& event)
 			: m_Event(event)
-		{
-		}
-		
+		{}
+
 		// F will be deduced by the compiler
 		template<typename T, typename F>
 		bool Dispatch(const F& func)
@@ -83,4 +95,3 @@ namespace Hazel {
 	}
 
 }
-
